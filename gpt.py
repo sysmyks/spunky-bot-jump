@@ -3,7 +3,7 @@ import sys
 from unidecode import unidecode
 
 # Définir votre clé d'API OpenAI
-openai.api_key = "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"
+openai.api_key = "api key"
 
 # Nom du fichier pour stocker l'historique des échanges
 history_file = "conversation_history.txt"
