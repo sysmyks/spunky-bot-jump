@@ -75,7 +75,8 @@ COMMANDS = {'help': {'desc': 'display all available commands', 'syntax': '^7Usag
             'transl': {'desc': 'translate into all languages', 'syntax': '^7Usage: ^2!transl <lang> <text>', 'level': 0, 'short': 'tr'},
             'ready': {'desc': 'active your personal timer', 'syntax': '^7Usage: ^2!ready or !r', 'level': 0, 'short': 'r'},
             'regainstamina': {'desc': 'active your personal timer', 'syntax': '^7Usage: ^2!regainstamina or !rgs', 'level': 0, 'short': 'rgs'},
-            
+            'setgoto': {'desc': 'set goto point', 'syntax': '^7Usage: ^2!setgoto <jump name>', 'level': 20},
+
             # user commands, level 1
             #'forgive': {'desc': 'forgive a player for team killing', 'syntax': '^7Usage: ^2!forgive ^7[<name>]', 'level': 20, 'short': 'f'},
             #'forgiveall': {'desc': 'forgive all team kills', 'syntax': '^7Usage: ^2!forgiveall', 'level': 20, 'short': 'fa'},
