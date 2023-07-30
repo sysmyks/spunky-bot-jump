@@ -1,0 +1,131 @@
+{
+    "ut4_orion": {
+        "way": [],
+        "loc": [
+            "Don't be scared, just fall down",
+            "Warming up, part 2.",
+            "Descent",
+            "On the way to Orion",
+            "Turn around the tube",
+            "Front and back jumps",
+            "Mirrored Corridor",
+            "Under Orion's Sky",
+            "The end :]",
+            "Symmetry",
+            "Fast Curve",
+            "Easy walljumps :)",
+            "Fast curve",
+            "Orion by b3e - Jump Mode Ready",
+            "Spawn area. Welcome :)",
+            "Slidin' on walls (aerodynamic's tribute)",
+            "Warming up, part 1."
+        ]
+    },
+    "ut4_quakbens_b1": {
+        "way": [
+            {
+                "name": "quak",
+                "type": 2
+            },
+            {
+                "name": "ulben path",
+                "type": 1
+            }
+        ],
+        "loc": [
+            "quak 4 - The Bait",
+            "Welcome to quakbens",
+            "quak 3 - The Turn",
+            "Ulbens 3",
+            "Ulbens 1",
+            "quak 5 - The Bad",
+            "Ulbens 2",
+            "quak 2 - The Twist",
+            "quak 1 - The Confuse",
+            "Ulbens 4",
+            "Ulbens 5",
+            "quak - The End"
+        ]
+    },
+    "ut4_cjumps_b2": {
+        "way": [
+            {
+                "name": "see?",
+                "type": 1
+            }
+        ],
+        "loc": [
+            "9",
+            "19",
+            "10",
+            "17",
+            "1",
+            "C",
+            "6",
+            "3",
+            "15",
+            "7",
+            "8",
+            "2",
+            "5",
+            "12",
+            "13",
+            "14",
+            "11",
+            "4",
+            "16",
+            "18"
+        ]
+    },
+    "ut43_icyproto": {
+        "way": [],
+        "loc": []
+    },
+    "ut43_icymonster_v1": {
+        "way": [
+            {
+                "name": "IcyWay",
+                "type": 2
+            },
+            {
+                "name": "FullWay",
+                "type": 4
+            },
+            {
+                "name": "JumpWay",
+                "type": 1
+            },
+            {
+                "name": "MarioWay",
+                "type": 3
+            }
+        ],
+        "loc": [
+            "LePark",
+            "LeGreyJump",
+            "RootsFire",
+            "LeGreenSmoke",
+            "n",
+            "LeBlueWall",
+            "LeRedWall",
+            "MonsterJumpFinal",
+            "LeBlueLongCrouch",
+            "MonsterJump 3",
+            "MonsterJump 1",
+            "LeLoopDrop",
+            "LeGreenLoop",
+            "LeBurineur",
+            "LeArcWallOrange",
+            "LeRambetterForever2",
+            "LeGreenPuncher",
+            "ReturnWay",
+            "MonsterJump 2",
+            "MonsterJump 4",
+            "LeLavaJumps",
+            "LeSpeedCrouch",
+            "LeBigAirOrange",
+            "LePinkChute",
+            "bienvenue sur IcyMonster"
+        ]
+    }
+}
