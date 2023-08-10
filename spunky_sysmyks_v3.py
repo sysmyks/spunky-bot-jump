@@ -65,6 +65,7 @@ COMMANDS = {'help': {'desc': 'display all available commands', 'syntax': '^7Usag
             'tp': {'desc': 'Goto to a specific player', 'syntax': '^7Usage: ^2!tp <name>', 'level': 0},
             'allowgoto': {'desc': 'active allowgoto', 'syntax': '^7Usage: !allowgoto', 'level': 0, 'short': 'alg'},
             'maps': {'desc': 'display all available maps', 'syntax': '^7Usage: ^2!maps', 'level': 0},
+            'mapinfo': {'desc': 'display mapinfo', 'syntax': '^7Usage: ^2!mapinfo', 'level': 0 , 'short': 'mi'},
             'spec': {'desc': 'move yourself to either spectator', 'syntax': '^7Usage: ^2!spec',  'level': 0, 'short': 'sp'},
             'play': {'desc': 'move yourself to either game', 'syntax': '^7Usage: ^2!spec or !play',  'level': 0, 'short': 'pl'},
             'vote': {'desc': 'Lists all callvote options', 'syntax': '^7Usage: ^2!vote',  'level': 0},
@@ -1560,6 +1561,15 @@ class LogParser(object):
                         self.game.rcon_tell(sar['player_num'], "^7Super Admin commands: ^3%s" % ', ^3'.join(
                             self.clean_cmd_list(self.superadmin_cmds)))
 # jumper commands
+            
+            elif sar['command'] in ('!mapinfo', '!mi'):
+                mapname = self.game.get_cvar('mapname')
+                cmd = ['python3', 'mod/parser_info_urt.py'] + [str(mapname)]
+                result = subprocess.check_output(cmd, universal_newlines=True).strip()
+                if mapname: 
+                    self.game.rcon_say(result)
+                    
+                
             elif sar['command'] == '!drop':
                 self.game.send_rcon("spoof %s ut_itemdrop medkit" % (self.game.players[sar['player_num']].get_name()))
                 self.game.send_rcon("spoof %s ut_itemdrop Helmet" % (self.game.players[sar['player_num']].get_name()))
@@ -4863,7 +4873,7 @@ class Game(object):
         @type  pm_tag: bool
         """
         lines = textwrap.wrap(msg, 128)
-        prefix = "^4[pm] "
+        prefix = "^4[pm]^7 "
         for line in lines:
             if pm_tag:
                 self.send_rcon('tell %d %s%s' % (player_num, prefix, line))
