@@ -56,7 +56,7 @@ logger.propagate = False
 BOT_PLAYER_NUM = 1022
 
 # RCON Delay in seconds, recommended range: 0.18 - 0.33
-RCON_DELAY = 0.3
+RCON_DELAY = 0.35
 
 COMMANDS = {'help': {'desc': 'display all available commands', 'syntax': '^7Usage: ^2!help', 'level': 0, 'short': 'h'},
             # jumper commands, level 0
@@ -688,8 +688,7 @@ class LogParser(object):
                         self.game.rcon_say(
                             "^1ALERT: ^2%s ^7auto-kick from warnings if not cleared" % player_name)
 
-                # check for player with high ping
-                self.check_player_ping()
+                
 
         except Exception as err:
             logger.error(err, exc_info=True)
@@ -848,8 +847,9 @@ class LogParser(object):
         # set the current map
         self.game.set_current_map()
         # load all available maps
+        self.game.get_all_maps()
         self.game.set_all_maps()
-
+        
         # support for low gravity server
         if self.support_lowgravity:
             self.game.send_rcon("set g_gravity %d" % self.gravity)
@@ -866,7 +866,8 @@ class LogParser(object):
         # allow nextmap votes
         self.allow_nextmap_vote = True
         self.failed_vote_timer = 0
-
+        
+        
     def handle_spawn(self, line):
         """
         handle client spawn
@@ -876,7 +877,30 @@ class LogParser(object):
             self.game.players[player_num].set_alive(True)
             if self.game.get_cvar('timelimit') != '0':
                 self.game.send_rcon('timelimit 0')
-   
+            
+            if self.game.get_cvar('mapname'):
+                racemap_file = "mod/racemap.txt"
+                mapname = self.game.get_cvar('mapname')
+                with open(racemap_file, 'r') as file:
+                    racemap_list = [map_name.strip() for map_name in file.readlines()]
+                if mapname in racemap_list:
+                    self.game.send_rcon('g_stamina 2')
+                else:
+                    self.game.send_rcon('g_stamina 1')
+                    
+            else:
+                time.sleep(2)
+                racemap_file = "mod/racemap.txt"
+                mapname = self.game.get_cvar('mapname')
+                with open(racemap_file, 'r') as file:
+                    racemap_list = [map_name.strip() for map_name in file.readlines()]
+                if mapname in racemap_list:
+                    self.game.send_rcon('g_stamina 2')
+                else:
+                    self.game.send_rcon('g_stamina 1')
+                
+    
+    
     def handle_flagcapturetime(self, line):
         """
         handle flag capture time
@@ -898,6 +922,8 @@ class LogParser(object):
         logger.debug("Warmup... %s", line)
         self.allow_cmd_teams = True
 
+    
+    
     def handle_initround(self, _):
         """
         handle Init Round
@@ -1092,7 +1118,7 @@ class LogParser(object):
                 player.disable_welcome_msg()
             logger.debug(
                 "ClientBegin: Player %d %s has entered the game", player_num, player_name)
-
+        
     
         
     
@@ -1114,9 +1140,10 @@ class LogParser(object):
                 player.clear_tk(player_num)
                 player.clear_grudged_player(player_num)
                 if self.game.get_number_players() == 0 :
-                    self.game.send_rcon("timelimit 10")   
-            logger.debug(
-                "ClientDisconnect: Player %d %s has left the game", player_num, player_name)
+                    self.game.send_rcon("timelimit 10")
+                    
+            
+            logger.debug("ClientDisconnect: Player %d %s has left the game", player_num, player_name)
 
     def handle_hit(self, line):
         """
@@ -1421,7 +1448,7 @@ class LogParser(object):
         map_list = []
         append = map_list.append
         for maps in self.game.get_all_maps():
-            if map_name.lower() == maps or ('ut4_%s' % map_name.lower()) == maps:
+            if map_name.lower() == maps or ('ut%s' % map_name.lower()) == maps:
                 append(maps)
                 break
             elif map_name.lower() in maps:
@@ -1530,45 +1557,50 @@ class LogParser(object):
                     if cmd in COMMANDS:
                         if self.game.players[sar['player_num']].get_admin_role() >= COMMANDS[cmd]['level']:
                             self.game.rcon_tell(
-                                sar['player_num'], "%s ^3- %s" % (COMMANDS[cmd]['syntax'], COMMANDS[cmd]['desc']))
+                                sar['player_num'], "%s ^8- %s" % (COMMANDS[cmd]['syntax'], COMMANDS[cmd]['desc']))
                     elif cmd in self.shortcut_cmd:
                         if self.game.players[sar['player_num']].get_admin_role() >= COMMANDS[self.shortcut_cmd[cmd]]['level']:
-                            self.game.rcon_tell(sar['player_num'], "%s ^3- %s" % (
+                            self.game.rcon_tell(sar['player_num'], "%s ^8- %s" % (
                                 COMMANDS[self.shortcut_cmd[cmd]]['syntax'], COMMANDS[self.shortcut_cmd[cmd]]['desc']))
                     else:
                         if cmd not in self.superadmin_cmds:
                             self.game.rcon_tell(
-                                sar['player_num'], "^7Unknown command ^3%s" % cmd)
+                                sar['player_num'], "^7Unknown command ^8%s" % cmd)
                 else:
                     if self.game.players[sar['player_num']].get_admin_role() < 20:
-                        self.game.rcon_tell(sar['player_num'], "^7Jumper commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Jumper commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.user_cmds)))
                     # help for mods - additional commands
                     elif self.game.players[sar['player_num']].get_admin_role() == 20:
-                        self.game.rcon_tell(sar['player_num'], "^7Moderator commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Moderator commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.mod_cmds)))
                     # help for admins - additional commands
                     elif self.game.players[sar['player_num']].get_admin_role() == 40:
-                        self.game.rcon_tell(sar['player_num'], "^7Admin commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Admin commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.admin_cmds)))
                     elif self.game.players[sar['player_num']].get_admin_role() == 60:
-                        self.game.rcon_tell(sar['player_num'], "^7Full Admin commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Full Admin commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.fulladmin_cmds)))
                     elif self.game.players[sar['player_num']].get_admin_role() == 80:
-                        self.game.rcon_tell(sar['player_num'], "^7Senior Admin commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Senior Admin commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.senioradmin_cmds)))
                     elif self.game.players[sar['player_num']].get_admin_role() >= 90:
-                        self.game.rcon_tell(sar['player_num'], "^7Super Admin commands: ^3%s" % ', ^3'.join(
+                        self.game.rcon_tell(sar['player_num'], "^7Super Admin commands: ^8%s" % ', ^8'.join(
                             self.clean_cmd_list(self.superadmin_cmds)))
 # jumper commands
             
             elif sar['command'] in ('!mapinfo', '!mi'):
                 mapname = self.game.get_cvar('mapname')
-                cmd = ['python3', 'mod/parser_info_urt.py'] + [str(mapname)]
-                result = subprocess.check_output(cmd, universal_newlines=True).strip()
-                if mapname: 
+                if mapname :     
+                    cmd = ['python3', 'mod/parser_info_urt.py'] + [str(mapname)]
+                    result = subprocess.check_output(cmd, universal_newlines=True).strip()
                     self.game.rcon_say(result)
-                    
+                else:
+                    time.sleep(2)
+                    mapname = self.game.get_cvar('mapname')
+                    cmd = ['python3', 'mod/parser_info_urt.py'] + [str(mapname)]
+                    result = subprocess.check_output(cmd, universal_newlines=True).strip()
+                    self.game.rcon_say(result)
                 
             elif sar['command'] == '!drop':
                 self.game.send_rcon("spoof %s ut_itemdrop medkit" % (self.game.players[sar['player_num']].get_name()))
@@ -1613,7 +1645,7 @@ class LogParser(object):
             elif sar['command'] in ('!mapname', '!mn'):
                 mapname = self.game.get_cvar('mapname')
                 msg = ("^7Mapname: [^2%s^7]" % mapname)
-                self.tell_say_message(sar, msg)
+                self.game.rcon_tell(sar['player_num'], msg)
 
             # vote on setting nextmap
             elif sar['command'] in ('!votenextmap', '!vn'):
@@ -3078,14 +3110,12 @@ class LogParser(object):
 
             # mapcycle - list the map rotation
             elif sar['command'] in ('!mapcycle', '@mapcycle') and self.game.players[sar['player_num']].get_admin_role() >= COMMANDS['mapcycle']['level']:
-                self.tell_say_message(sar, "^7Mapcycle: ^3%s" %
-                                      ', '.join(self.game.maplist))
+                self.tell_say_message(sar, "^7Mapcycle: %s" % ', '.join(self.game.maplist))
 
             # maps - display all available maps
             elif (sar['command'] == '!maps' or sar['command'] == '@maps') and self.game.players[sar['player_num']].get_admin_role() >= COMMANDS['maps']['level']:
                 map_list = self.game.get_all_maps()
-                msg = "^7Available Maps [^2%s^7]: ^3%s" % (
-                    len(map_list), ', ^3'.join(map_list))
+                msg = "^7Available Maps [^2%s^7]: [^3%s^7]" % (len(map_list), '^7], [^3'.join(map_list))
                 self.tell_say_message(sar, msg)
 
             # maprestart - restart the map
@@ -5002,8 +5032,8 @@ class Game(object):
             while True:
                 ret_val = self.get_rcon_output("dir map bsp")[1].split()
                 if "Directory" in ret_val:
-                    count += 0.25
-                if count >= 2:
+                    count += 1
+                if count >= 5:
                     break
                 else:
                     all_maps += ret_val
@@ -5014,7 +5044,9 @@ class Game(object):
                 self.all_maps_list = all_maps_list
         except Exception as err:
             logger.error(err, exc_info=True)
-
+    
+    
+    
     def get_all_maps(self):
         """
         get a list of all available maps
